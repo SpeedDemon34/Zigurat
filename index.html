@@ -1,0 +1,766 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>3B Zigurat — Ur Zigguratı Katları</title>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;overflow:hidden;background:#1b1410;font-family:Inter,sans-serif;color:#f3e6d3}
+#c{position:fixed;inset:0;display:block;touch-action:none}
+button{font-family:inherit}
+.glass{background:#211813e6;border:1px solid #5a4330;backdrop-filter:blur(8px);box-shadow:0 10px 40px #0006}
+header{position:fixed;top:14px;left:18px;z-index:3;display:flex;flex-direction:column;gap:8px;pointer-events:none}
+header h1{font-family:Cinzel,serif;font-size:26px;letter-spacing:.06em;color:#f6d9a4;text-shadow:0 2px 12px #000a}
+header p{font-size:13px;opacity:.85;text-shadow:0 1px 6px #000a}
+#models{display:flex;gap:6px;pointer-events:auto}
+.pill{all:unset;cursor:pointer;padding:7px 12px;border-radius:999px;background:#2a1f18dd;border:1px solid #5a4330;font-size:12.5px;font-weight:500;transition:.2s;white-space:nowrap}
+.pill:hover{background:#3d2c20}
+.pill.on{background:#c98a3e;color:#1b1410;border-color:#f6d9a4;font-weight:600}
+#levels{position:fixed;left:18px;top:50%;transform:translateY(-50%);z-index:3;display:flex;flex-direction:column;gap:6px}
+#levels .pill{border-radius:10px;padding:9px 14px;min-width:178px;font-size:13px}
+#levels .pill span{display:inline-block;width:22px;font-family:Cinzel,serif;font-weight:700}
+#panel{position:fixed;right:18px;top:18px;bottom:78px;width:min(400px,calc(100vw - 36px));z-index:3;border-radius:16px;display:flex;flex-direction:column;overflow:hidden}
+#panel.hide{display:none}
+.tabs{display:flex;flex-wrap:wrap;gap:4px;padding:10px 10px 8px;border-bottom:1px solid #4a372a}
+.tab{all:unset;cursor:pointer;font-size:12px;padding:6px 9px;border-radius:8px;opacity:.8}
+.tab:hover{background:#3a2a1f;opacity:1}
+.tab.on{background:#c98a3e;color:#1b1410;opacity:1;font-weight:600}
+#collapse{margin-left:auto}
+#pbody{padding:18px 20px 22px;overflow:auto;flex:1}
+#pbody .tag{font-size:11px;letter-spacing:.15em;text-transform:uppercase;color:#c98a3e;font-weight:600}
+#pbody h2{font-family:Cinzel,serif;font-size:21px;color:#f6d9a4;margin:6px 0 12px}
+#pbody h3{font-family:Cinzel,serif;font-size:16px;color:#f6d9a4;margin:14px 0 8px}
+#pbody p{font-size:14px;line-height:1.6;margin-bottom:10px;opacity:.93}
+#pbody ul{margin:4px 0 12px 18px;font-size:14px;line-height:1.6}
+.facts{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:12px 0}
+.facts div{background:#2f231a;border-radius:10px;padding:8px 10px}
+.facts b{display:block;font-size:16px;color:#f6d9a4}
+.facts small{font-size:11px;opacity:.7}
+.note{font-size:12px!important;opacity:.65!important}
+table{width:100%;border-collapse:collapse;font-size:12.5px;margin:8px 0 12px}
+th,td{border-bottom:1px solid #4a372a;padding:7px 6px;text-align:left;vertical-align:top;line-height:1.45}
+th{color:#f6d9a4;font-weight:600}
+td:first-child{color:#c98a3e;font-weight:600;white-space:nowrap}
+.tl{border-left:2px solid #c98a3e;margin:6px 0 0 6px;padding-left:14px}
+.tl div{position:relative;margin-bottom:14px;font-size:13.5px;line-height:1.5}
+.tl div:before{content:"";position:absolute;left:-21px;top:5px;width:10px;height:10px;border-radius:50%;background:#f6d9a4;border:2px solid #c98a3e}
+.tl b{color:#f6d9a4;display:block}
+.q{background:#2a1f18;border-radius:10px;padding:10px 12px;margin-bottom:10px}
+.q p{margin-bottom:6px!important}
+.q label{display:block;font-size:13.5px;padding:5px 8px;border-radius:7px;cursor:pointer}
+.q label:hover{background:#3a2a1f}
+.q label.ok{background:#3c6b35}
+.q label.bad{background:#7a2f2a}
+.btn{all:unset;cursor:pointer;background:#c98a3e;color:#1b1410;font-weight:600;padding:9px 16px;border-radius:10px;font-size:14px}
+.score{font-family:Cinzel,serif;font-size:24px;color:#f6d9a4;margin-top:12px}
+#openPanel{position:fixed;right:18px;top:18px;z-index:3;display:none}
+#bar{position:fixed;left:50%;bottom:14px;transform:translateX(-50%);z-index:3;display:flex;gap:6px;flex-wrap:wrap;justify-content:center;max-width:calc(100vw - 24px)}
+#pres{position:fixed;left:50%;bottom:14px;transform:translateX(-50%);z-index:4;display:none;align-items:center;gap:10px;padding:8px 10px;border-radius:999px}
+#pres .t{font-size:13px;min-width:170px;text-align:center}
+#pres .t b{font-family:Cinzel,serif;color:#f6d9a4}
+#legend{position:fixed;left:18px;bottom:70px;z-index:3;border-radius:12px;padding:10px 12px;font-size:12px;display:none}
+#legend div{display:flex;align-items:center;gap:8px;margin:3px 0}
+#legend i{width:16px;height:12px;border-radius:3px;display:inline-block}
+#hint{position:fixed;left:18px;bottom:20px;font-size:12px;opacity:.65;z-index:2;text-shadow:0 1px 4px #000}
+#modal{position:fixed;inset:0;background:#000a;z-index:10;display:none;align-items:center;justify-content:center;padding:20px}
+#modal .box{max-width:min(900px,96vw);max-height:92vh;overflow:auto;border-radius:16px;padding:18px;position:relative}
+#modal img{max-width:100%;border-radius:10px;display:block;margin:10px 0}
+#modal .x{position:absolute;right:10px;top:8px}
+.lbl{position:absolute;transform:translate(-50%,-50%);font-size:12px;font-weight:600;padding:3px 8px;border-radius:6px;background:#211813cc;border:1px solid #c98a3e;white-space:nowrap;cursor:pointer;pointer-events:auto}
+.lbl.on{background:#c98a3e;color:#1b1410}
+.lbl.human{border-color:#7fb3e0}
+@media (max-width:820px){
+  #levels{top:auto;bottom:auto;top:112px;transform:none;flex-direction:row;flex-wrap:wrap;left:10px;right:10px}
+  #levels .pill{min-width:0;padding:6px 9px;font-size:11.5px}
+  #levels .pill span{width:auto;margin-right:4px}
+  #panel{top:auto;bottom:118px;height:36vh;right:10px;left:10px;width:auto}
+  #openPanel{top:auto;bottom:118px;right:10px}
+  #hint{display:none}
+  header{left:10px;top:10px}
+  header h1{font-size:19px}
+  #bar .pill{padding:6px 9px;font-size:11.5px}
+  #legend{bottom:auto;top:200px;left:10px}
+}
+</style>
+</head>
+<body>
+<canvas id="c"></canvas>
+<header>
+  <div><h1 id="title"></h1><p id="sub"></p></div>
+  <div id="models">
+    <button class="pill" data-m="ur">Ur Zigguratı · 3 teras</button>
+    <button class="pill" data-m="babil">Babil (Etemenanki) · 7 kat</button>
+  </div>
+</header>
+<div id="levels"></div>
+<aside id="panel" class="glass">
+  <div class="tabs">
+    <button class="tab" data-t="katlar">Katlar</button>
+    <button class="tab" data-t="karsilastir">Karşılaştır</button>
+    <button class="tab" data-t="zaman">Zaman</button>
+    <button class="tab" data-t="harita">Harita</button>
+    <button class="tab" data-t="sinav">Sınav</button>
+    <button class="tab" data-t="kaynak">Kaynaklar</button>
+    <button class="tab" id="collapse" title="Paneli gizle">✕</button>
+  </div>
+  <div id="pbody"></div>
+</aside>
+<button id="openPanel" class="pill">ℹ Bilgi paneli</button>
+<div id="legend" class="glass">
+  <b style="display:block;margin-bottom:4px">Kesit</b>
+  <div><i style="background:#9a5530"></i>Pişmiş tuğla + bitüm kaplama</div>
+  <div><i style="background:#cfb084"></i>Kerpiç çekirdek</div>
+  <div><i style="background:#6f7f3a"></i>Kamış hasır katmanları</div>
+  <div><i style="background:#3a2a1f"></i>Drenaj kanalları</div>
+</div>
+<div id="bar">
+  <button class="pill" id="bCut">✂ Kesit</button>
+  <button class="pill" id="bExplode">⇕ Katları Ayır</button>
+  <button class="pill" id="bBuild">🧱 İnşa Et</button>
+  <button class="pill" id="bProc">🚶 Rahip Alayı</button>
+  <button class="pill" id="bHuman">🧍 İnsan Ölçeği</button>
+  <button class="pill" id="bMode">☀ Gün</button>
+  <button class="pill on" id="bLabels">🏷 Etiketler</button>
+  <button class="pill on" id="bRotate">⟳ Dönüş</button>
+  <button class="pill" id="bPres">▶ Sunum Modu</button>
+  <button class="pill" id="bShot">📷 Görüntü</button>
+  <button class="pill" id="bReset">⌂ Sıfırla</button>
+</div>
+<div id="pres" class="glass">
+  <button class="pill" id="pPrev">◀</button>
+  <div class="t" id="pText"></div>
+  <button class="pill" id="pNext">▶</button>
+  <button class="pill" id="pExit">✕</button>
+</div>
+<div id="hint">Sürükle: döndür · Sağ tık/iki parmak: kaydır · Tekerlek: yakınlaş · Kata tıkla: bilgi</div>
+<div id="modal"><div class="box glass"><button class="pill x" id="mClose">✕</button><div id="mbody"></div></div></div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+<script>
+const $=s=>document.querySelector(s);
+const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
+const easeOut=k=>1-Math.pow(1-k,3);
+const easeIO=k=>k<.5?2*k*k:1-Math.pow(-2*k+2,2)/2;
+
+/* =================== İÇERİK =================== */
+const UR_INFO={
+ genel:{no:'◆',name:'Genel Bakış',tag:'Zigurat nedir?',html:`
+  <p>Zigurat, Mezopotamya'da (bugünkü Irak) yapılan, üst üste küçülen <b>teraslardan</b> oluşan basamaklı tapınak kulesidir. Kelime Akadca <i>ziqqurratu</i> — "yüksek yer, zirve" anlamına gelir.</p>
+  <p>Bu model en iyi korunmuş örnek olan <b>Ur Zigguratı</b>'nı esas alır. Sümercesi <b>Etemenniğuru</b>'dur (yaklaşık "dehşet saçan temelin evi"). Ur'un 3. Hanedanı kralı <b>Ur-Nammu</b> başlatmış, oğlu <b>Şulgi</b> tamamlamıştır. Ay tanrısı <b>Nanna (Sin)</b>'ya adanmıştır.</p>
+  <div class="facts"><div><b>~64 × 46 m</b><small>Taban</small></div><div><b>~30 m</b><small>Tahmini yükseklik</small></div><div><b>3 teras</b><small>+ tepe tapınağı</small></div><div><b>Kerpiç</b><small>Çekirdek malzeme</small></div></div>
+  <p>Ziguratın içinde oda yoktur; <b>masif</b> bir yapıdır (içini görmek için <b>✂ Kesit</b> düğmesine bas). Tanrıyı göğe yaklaştıran yapay bir "dağ" olarak düşünülmüştür. Halk tepeye çıkamaz, yalnızca rahipler çıkabilirdi.</p>
+  <p class="note">Üst katlar günümüze ulaşmadığı için ölçüleri arkeolojik yeniden yapılandırmaya dayanan tahminlerdir.</p>`},
+ temel:{no:'0',name:'Temel ve Avlu',tag:'Zemin',html:`
+  <p>Zigurat, kutsal alanı çevreleyen duvarlı bir <b>avlu (temenos)</b> içinde, yükseltilmiş bir platform üzerine oturur.</p>
+  <ul><li>Kutsal alan şehirden kalın duvarlarla ayrılırdı.</li><li>Avluda <b>depolar, rahip konutları, mutfaklar</b> ve küçük tapınaklar vardı.</li><li>Yapının köşeleri ana yönlere (K-G-D-B) bakar.</li><li>Şehir <b>Fırat</b> nehrinin kıyısındaydı; çevresi hurma bahçeleriyle kaplıydı.</li></ul>
+  <p>Bölgede taş az olduğu için temel de dahil her şey <b>kil ve tuğladan</b> yapılmıştır.</p>`},
+ k1:{no:'1',name:'1. Teras (Ana Gövde)',tag:'Birinci kat',html:`
+  <p>En büyük ve bugün en iyi korunmuş kattır. Yapının kütlesinin çoğunu oluşturur.</p>
+  <div class="facts"><div><b>~64 × 46 m</b><small>Taban</small></div><div><b>~11 m</b><small>Yükseklik</small></div></div>
+  <ul><li><b>Çekirdek:</b> güneşte kurutulmuş kerpiç.</li><li><b>Dış kaplama:</b> ~2,5 m kalınlığında, <b>bitümle (zift)</b> örülmüş pişmiş tuğla; yağmura karşı korur.</li><li><b>Kamış hasır katmanları:</b> kerpiç sıraları arasına serilir, yapıyı birbirine bağlar.</li><li><b>Drenaj delikleri:</b> içteki nemin dışarı çıkmasını sağlar.</li><li><b>Payandalar:</b> duvarı bölen dikey çıkıntılar; hem süs hem destek.</li><li>Duvarlar <b>içe eğimlidir</b>; yapıyı sağlamlaştırır ve daha yüksek gösterir.</li></ul>`},
+ merdiven:{no:'⇡',name:'Merdivenler',tag:'Çıkış yolu',html:`
+  <p>Ön (kuzeydoğu) cephede <b>üç anıtsal merdiven</b> vardır:</p>
+  <ul><li><b>Orta merdiven</b> cepheye dik uzanır.</li><li><b>İki yan merdiven</b> duvara paralel yükselir.</li><li>Her biri yaklaşık <b>100 basamaklıdır</b>.</li><li>Üçü birinci terasın üstündeki <b>kapı yapısında</b> birleşir.</li></ul>
+  <p>Merdivenler, tören alaylarının tanrıya doğru "yükselişini" simgeler (<b>🚶 Rahip Alayı</b> düğmesine bas). Kapıdan sonra daha dar merdivenler üst katlara çıkar.</p>`},
+ k2:{no:'2',name:'2. Teras',tag:'İkinci kat',html:`
+  <p>Birinci terasın üzerine, kenarlardan geri çekilerek oturtulmuş daha küçük bir teras. Böylece etrafında yürünebilen bir <b>gezinti alanı</b> kalır.</p>
+  <ul><li>Birinci kattan daha alçak ve dar.</li><li>Aynı tuğla kaplama ve eğimli duvar tekniği kullanılmıştır.</li><li>Teraslarda <b>ağaç ve bitkiler</b> olduğu düşünülür ("dağ" fikri).</li></ul>
+  <p class="note">Bu kat bugün büyük ölçüde yıkıktır. Görünüm, Leonard Woolley'nin 1922–1934 kazılarına dayanan yeniden yapılandırmadır.</p>`},
+ k3:{no:'3',name:'3. Teras',tag:'Üçüncü kat',html:`
+  <p>Tapınağı taşıyan en küçük teras. Yüksekliği sayesinde şehrin her yerinden ve düz ovadan kilometrelerce öteden görülebilirdi.</p>
+  <ul><li>Yalnızca rahiplerin girebildiği alan.</li><li>Tepe tapınağına çıkan son merdiven buradadır.</li><li>Ziguratın "basamaklı dağ" silüetini tamamlar.</li></ul>`},
+ tapinak:{no:'▲',name:'Tepe Tapınağı',tag:'Zirve',html:`
+  <p>En üstte ay tanrısı <b>Nanna</b>'ya adanmış küçük bir <b>tapınak</b> bulunurdu.</p>
+  <ul><li>Tanrının yeryüzüne indiği ve dinlendiği yer sayılırdı.</li><li>Rahipler burada ritüel yapar ve sunu sunardı.</li><li>Ayın hareketlerini izlemek için de kullanılmış olabilir.</li><li>Bu kısım günümüze ulaşmamıştır.</li></ul>
+  <p><b>Piramitten farkı:</b> piramit bir <b>mezardır</b> ve sivri biter. Zigurat ise bir <b>tapınak kaidesidir</b>; düz terasları ve tepesinde tapınağı vardır. Ayrıntılar <b>Karşılaştır</b> sekmesinde.</p>`}
+};
+const BABIL_INFO={
+ genel:{no:'◆',name:'Genel Bakış',tag:'Etemenanki',html:`
+  <p><b>Etemenanki</b> ("gök ile yerin temel platformu evi"), Babil'in baş tanrısı <b>Marduk</b>'a adanmış dev zigurattır. Son halini MÖ 7.–6. yüzyılda <b>Nabopolassar</b> ve oğlu <b>II. Nebukadnezar</b> vermiştir.</p>
+  <div class="facts"><div><b>~91 × 91 m</b><small>Kare taban</small></div><div><b>~91 m</b><small>Tahmini yükseklik</small></div><div><b>7 kat</b><small>Tapınak dahil</small></div><div><b>Marduk</b><small>Adandığı tanrı</small></div></div>
+  <p>Ölçüler, katların boyutlarını veren <b>Esagila tableti</b> adlı çivi yazılı metne dayanır. Tevrat'taki <b>Babil Kulesi</b> anlatısının bu yapıdan esinlendiği düşünülür.</p>
+  <p class="note">Bugün yalnızca temelinin izi kalmıştır; model, tablet ve kazı verilerine dayanan bir tahmindir.</p>`},
+ temel:{no:'0',name:'Temel ve Avlu',tag:'Zemin',html:`
+  <p>Zigurat, duvarlarla çevrili dev bir kutsal avlunun ortasında duruyordu. Avlunun çevresinde rahip odaları ve depolar vardı.</p>
+  <ul><li>Hemen güneyinde Marduk'un ana tapınağı <b>Esagila</b> bulunuyordu.</li><li>Yapı, Fırat nehri kıyısındaki şehrin tam merkezindeydi.</li></ul>`},
+ k1:{no:'1',name:'1. Kat',tag:'Ana gövde',html:`
+  <div class="facts"><div><b>~91 × 91 m</b><small>Taban</small></div><div><b>~33 m</b><small>Yükseklik</small></div></div>
+  <ul><li>Kerpiç çekirdeği, yaklaşık <b>15 m kalınlığında</b> bir pişmiş tuğla kaplama sarar.</li><li>Duvarlar Ur'a göre çok daha diktir ve dikey <b>nişler/payandalarla</b> bölünmüştür.</li><li>Tek başına 10 katlı bir apartman yüksekliğindedir.</li></ul>`},
+ merdiven:{no:'⇡',name:'Merdivenler',tag:'Çıkış yolu',html:`
+  <p>Güney cephede, Ur'daki gibi <b>üç merdivenli</b> bir düzen olduğu düşünülür: uzun bir orta merdiven ve iki yan merdiven.</p>
+  <p>Merdivenler birinci katın üstünde birleşir, oradan dar merdivenler ve rampalarla üst katlara çıkılırdı.</p>`},
+ k2:{no:'2',name:'2. Kat',tag:'İkinci kat',html:`
+  <div class="facts"><div><b>~78 × 78 m</b><small>Taban</small></div><div><b>~18 m</b><small>Yükseklik</small></div></div>
+  <p>İkinci büyük kütle. Birinci katın üstünde geniş bir teras bırakacak şekilde geri çekilmiştir.</p>`},
+ ust:{no:'3–6',name:'3.–6. Katlar',tag:'Üst katlar',html:`
+  <p>Dört alçak kat, her biri yaklaşık <b>6 m</b> yüksekliğindedir ve yukarı çıktıkça küçülür:</p>
+  <ul><li>3. kat: ~60 × 60 m</li><li>4. kat: ~51 × 51 m</li><li>5. kat: ~42 × 42 m</li><li>6. kat: ~33 × 33 m</li></ul>
+  <p>Bazı yeniden yapılandırmalarda katların farklı renklere boyandığı düşünülür.</p>`},
+ tapinak:{no:'7',name:'7. Kat — Tapınak',tag:'Zirve',html:`
+  <div class="facts"><div><b>~24 × 21 m</b><small>Taban</small></div><div><b>~15 m</b><small>Yükseklik</small></div></div>
+  <p>En üstte Marduk'un kutsal odası vardı. Antik Yunan tarihçisi <b>Herodot</b> (MÖ 5. yy), tepedeki tapınakta büyük bir yatak ve altın bir masa bulunduğunu anlatır.</p>
+  <p>Babil'in İştar Kapısı'ndaki gibi <b>mavi sırlı tuğlalarla</b> kaplı olduğu düşünülür.</p>`}
+};
+
+const COMPARE=`
+ <h2>Karşılaştırma</h2>
+ <table><tr><th></th><th>Ur Zigguratı</th><th>Etemenanki (Babil)</th><th>Keops Piramidi</th></tr>
+ <tr><td>Yer</td><td>Ur, güney Irak</td><td>Babil, orta Irak</td><td>Giza, Mısır</td></tr>
+ <tr><td>Dönem</td><td>MÖ ~2100</td><td>MÖ 7.–6. yy (son hali)</td><td>MÖ ~2560</td></tr>
+ <tr><td>Amaç</td><td>Tapınak kaidesi (Nanna)</td><td>Tapınak kaidesi (Marduk)</td><td>Firavun mezarı</td></tr>
+ <tr><td>Taban</td><td>~64 × 46 m</td><td>~91 × 91 m</td><td>~230 × 230 m</td></tr>
+ <tr><td>Yükseklik</td><td>~30 m (tahmini)</td><td>~91 m (tahmini)</td><td>~146 m (orijinal)</td></tr>
+ <tr><td>Biçim</td><td>3 teras, eğimli duvar</td><td>7 kat, dik duvar</td><td>Düz yüzlü, sivri</td></tr>
+ <tr><td>Malzeme</td><td>Kerpiç + pişmiş tuğla, bitüm</td><td>Kerpiç + pişmiş tuğla</td><td>Kireçtaşı, granit</td></tr>
+ <tr><td>İç</td><td>Masif, oda yok</td><td>Masif, oda yok</td><td>Koridorlar ve odalar</td></tr>
+ <tr><td>Tepe</td><td>Tapınak</td><td>Tapınak</td><td>Sivri uç</td></tr>
+ <tr><td>Bugün</td><td>1. kat ayakta (restore)</td><td>Yalnızca temel izi</td><td>Büyük ölçüde ayakta</td></tr></table>
+ <h3>Akılda kalsın</h3>
+ <ul><li><b>Zigurat = tapınağa çıkan dağ.</b> Halk aşağıda kalır, tanrı yukarıda.</li><li><b>Piramit = mezar.</b> Ölen firavunu korur, içinde odalar vardır.</li><li>Mezopotamya'da taş az, kil boldu; bu yüzden ziguratlar <b>tuğladan</b> yapıldı.</li></ul>`;
+
+const TIMELINE={
+ ur:[['MÖ ~2100','Ur-Nammu yapımı başlatır, oğlu Şulgi tamamlar (Ur III Hanedanı).'],['MÖ ~2004','Elamlılar Ur\'u yağmalar; zigurat sonraki yüzyıllarda defalarca onarılır.'],['MÖ 6. yy','Babil kralı Nabonid ziguratı onarır, üst katları yeniler.'],['MÖ ~4. yy','Fırat\'ın yatağı değişince şehir yavaşça terk edilir.'],['1853–1854','J. E. Taylor köşelerde Nabonid\'in yazıtlı silindirlerini bulur; yapının Ur olduğu anlaşılır.'],['1922–1934','Leonard Woolley (British Museum + Penn Museum) kapsamlı kazılar yapar.'],['1980\'ler','Ön cephe ve merdivenler kısmen yeniden inşa edilir.'],['2016','Ur, "Güney Irak\'ın Ahvar Bölgesi" kapsamında UNESCO Dünya Mirası listesine girer.']],
+ babil:[['MÖ 18. yy','Hammurabi döneminde Babil\'de daha erken bir zigurat olduğu düşünülür.'],['MÖ 689','Asur kralı Sanherib Babil\'i yıkar.'],['MÖ 7.–6. yy','Nabopolassar yeniden yapımı başlatır, II. Nebukadnezar tamamlar.'],['MÖ 5. yy','Herodot, üst üste sekiz kuleden oluşan dev yapıyı anlatır.'],['MÖ 331 sonrası','Büyük İskender yeniden yapmak için yıkıntıları temizletir, ancak tamamlanamaz.'],['1899–1917','Robert Koldewey Babil kazılarını yürütür; zigurat temeli incelenir.'],['Bugün','Yalnızca kare temelin izi ve su dolu bir çukur kalmıştır.']]
+};
+
+const QUIZ=[
+ {q:'Ur Zigguratı hangi tanrıya adanmıştır?',a:['Marduk','Nanna (Ay tanrısı)','Enlil','İştar'],c:1},
+ {q:'Ziguratın çekirdeği hangi malzemedendir?',a:['Kireçtaşı','Mermer','Kerpiç','Granit'],c:2},
+ {q:'Dış kaplamadaki pişmiş tuğlalar neyle örülmüştür?',a:['Bitüm (zift)','Çimento','Demir kenet','Kireç harcı'],c:0},
+ {q:'Ur Zigguratı\'nın ön cephesinde kaç anıtsal merdiven vardır?',a:['1','2','4','3'],c:3},
+ {q:'Kerpiç sıraları arasındaki kamış hasır katmanlar ne işe yarar?',a:['Süsleme','Yapıyı bağlamak ve nemi dağıtmak','Isı yalıtımı','Ses yalıtımı'],c:1},
+ {q:'Ur Zigguratı\'nı yaptırmaya başlayan kral kimdir?',a:['Hammurabi','II. Nebukadnezar','Ur-Nammu','Sargon'],c:2},
+ {q:'Zigurat ile piramit arasındaki temel fark nedir?',a:['Zigurat tapınak kaidesi, piramit mezardır','İkisi de mezardır','Piramit tuğladan, zigurat taştandır','Ziguratın içinde odalar vardır'],c:0},
+ {q:'Duvarlardaki drenaj deliklerinin amacı nedir?',a:['Havalandırma','Ok atmak','İçteki suyu dışarı atmak','Işık almak'],c:2},
+ {q:'Babil Kulesi anlatısıyla ilişkilendirilen zigurat hangisidir?',a:['Ur Zigguratı','Etemenanki','Çoğa Zenbil','Dur-Kurigalzu'],c:1},
+ {q:'Ur kazılarını 1922–1934 arasında yöneten arkeolog kimdir?',a:['Howard Carter','Heinrich Schliemann','Arthur Evans','Leonard Woolley'],c:3}
+];
+
+const SOURCES=`
+ <h2>Kaynaklar</h2>
+ <ul>
+ <li>Woolley, C. L. <i>Ur Excavations V: The Ziggurat and its Surroundings</i>. British Museum &amp; University of Pennsylvania, 1939.</li>
+ <li>Woolley, C. L. <i>Ur of the Chaldees</i> (Keldanilerin Ur'u), 1929.</li>
+ <li>Encyclopaedia Britannica, "Ziggurat": <a style="color:#f6d9a4" href="https://www.britannica.com/technology/ziggurat" target="_blank">britannica.com/technology/ziggurat</a></li>
+ <li>UNESCO Dünya Mirası, "The Ahwar of Southern Iraq": <a style="color:#f6d9a4" href="https://whc.unesco.org/en/list/1481" target="_blank">whc.unesco.org/en/list/1481</a></li>
+ <li>Penn Museum, Ur koleksiyonu: <a style="color:#f6d9a4" href="https://www.penn.museum" target="_blank">penn.museum</a></li>
+ <li>Esagila tableti (Etemenanki ölçüleri), Louvre Müzesi.</li>
+ <li>Herodot, <i>Tarih</i>, I. kitap (Babil anlatısı).</li>
+ </ul>
+ <p class="note">Ödevde kullanmadan önce bilgileri bu kaynaklardan kontrol etmen önerilir. Üst katların ölçüleri tahmindir.</p>`;
+
+/* =================== SAHNE =================== */
+const canvas=$('#c');
+const renderer=new THREE.WebGLRenderer({canvas,antialias:true});
+renderer.setPixelRatio(Math.min(devicePixelRatio,2));
+renderer.shadowMap.enabled=true;renderer.shadowMap.type=THREE.PCFSoftShadowMap;
+renderer.localClippingEnabled=true;
+const scene=new THREE.Scene();
+scene.background=new THREE.Color(0xe9c28a);
+scene.fog=new THREE.Fog(0xe9c28a,160,380);
+const camera=new THREE.PerspectiveCamera(42,1,0.5,4000);
+const controls=new THREE.OrbitControls(camera,canvas);
+controls.enableDamping=true;controls.maxPolarAngle=Math.PI*0.495;controls.minDistance=8;
+controls.autoRotate=true;controls.autoRotateSpeed=0.5;
+
+const hemi=new THREE.HemisphereLight(0xfff1d6,0x8a6a45,.75);scene.add(hemi);
+const sun=new THREE.DirectionalLight(0xfff0d0,1);sun.castShadow=true;sun.shadow.mapSize.set(2048,2048);sun.shadow.bias=-0.0005;
+scene.add(sun);scene.add(sun.target);
+
+// Gece: yıldızlar + ay
+const stars=(()=>{const n=1500,p=new Float32Array(n*3);for(let i=0;i<n;i++){const th=Math.random()*Math.PI*2,ph=Math.random()*Math.PI*0.48,r=1500;p[i*3]=r*Math.sin(ph)*Math.cos(th);p[i*3+1]=r*Math.cos(ph);p[i*3+2]=r*Math.sin(ph)*Math.sin(th);}
+ const g=new THREE.BufferGeometry();g.setAttribute('position',new THREE.BufferAttribute(p,3));return new THREE.Points(g,new THREE.PointsMaterial({color:0xffffff,size:1.6,sizeAttenuation:false,fog:false}));})();
+stars.visible=false;scene.add(stars);
+const moon=new THREE.Mesh(new THREE.SphereGeometry(40,24,16),new THREE.MeshBasicMaterial({color:0xf6f0d6,fog:false}));
+moon.position.set(-900,700,-1000);moon.visible=false;scene.add(moon);
+
+// Doku
+function brickTex(base,mortar,rep){
+ const c=document.createElement('canvas');c.width=c.height=256;const g=c.getContext('2d');
+ g.fillStyle=mortar;g.fillRect(0,0,256,256);const bh=16,bw=48;
+ for(let y=0;y<256;y+=bh){const off=(y/bh)%2?bw/2:0;for(let x=-bw;x<256+bw;x+=bw){g.fillStyle=shade(base,(Math.random()*26-13)|0);g.fillRect(x+off+1,y+1,bw-2,bh-2);}}
+ const t=new THREE.CanvasTexture(c);t.wrapS=t.wrapT=THREE.RepeatWrapping;t.repeat.set(rep[0],rep[1]);return t;
+}
+function shade(hex,v){const n=parseInt(hex.slice(1),16);const f=x=>clamp(x+v,0,255);return`rgb(${f(n>>16)},${f((n>>8)&255)},${f(n&255)})`}
+
+// Kesit düzlemi (x > sabit kısmı gizler)
+const clipPlane=new THREE.Plane(new THREE.Vector3(-1,0,0),1e4);
+function cm(p){const m=new THREE.MeshStandardMaterial(Object.assign({roughness:.95},p));m.clippingPlanes=[clipPlane];m.clipShadows=true;return m;}
+const MAT={
+ brick1:cm({map:brickTex('#b07a48','#8a5c35',[6,2])}),
+ brick2:cm({map:brickTex('#c08b55','#93663d',[4,1.5])}),
+ brick3:cm({map:brickTex('#caa06a','#9c7447',[3,1])}),
+ brick4:cm({map:brickTex('#a86f45','#7f5233',[6,3])}),
+ brick5:cm({map:brickTex('#9c6a44','#764e30',[5,1])}),
+ brick6:cm({map:brickTex('#b98352','#8c5f39',[4,1])}),
+ top:cm({color:0xb98d5a,roughness:1}),
+ stair:cm({color:0xa56f40,roughness:.9}),
+ temple:cm({color:0xe6d2b0,roughness:.8}),
+ blue:cm({color:0x2f5d8a,roughness:.55}),
+ glaze:cm({color:0x2a5f9e,roughness:.35,metalness:.1}),
+ gold:cm({color:0xd8b050,roughness:.3,metalness:.7}),
+ plat:cm({map:brickTex('#a8814f','#8d6a40',[12,1])}),
+ mud:cm({color:0xc9a674,roughness:1}),
+ dark:(()=>{const m=new THREE.MeshBasicMaterial({color:0x2a1a10});m.clippingPlanes=[clipPlane];return m})()
+};
+const SEC={
+ shell:new THREE.MeshBasicMaterial({map:brickTex('#9a5530','#6e3a20',[1,1]),side:THREE.DoubleSide}),
+ core:new THREE.MeshBasicMaterial({color:0xcfb084,side:THREE.DoubleSide}),
+ reed:new THREE.MeshBasicMaterial({color:0x6f7f3a,side:THREE.DoubleSide}),
+ drain:new THREE.MeshBasicMaterial({color:0x3a2a1f,side:THREE.DoubleSide})
+};
+SEC.shell.map.wrapS=SEC.shell.map.wrapT=THREE.RepeatWrapping;
+const ENV={
+ ground:new THREE.MeshStandardMaterial({color:0xd8b27a,roughness:1}),
+ water:new THREE.MeshStandardMaterial({color:0x4f86a8,roughness:.25,metalness:.2}),
+ trunk:new THREE.MeshStandardMaterial({color:0x7a5a3a,roughness:1}),
+ leaf:new THREE.MeshStandardMaterial({color:0x4f7a35,roughness:1,side:THREE.DoubleSide}),
+ robe:new THREE.MeshStandardMaterial({color:0xf2ead8,roughness:.9}),
+ robe2:new THREE.MeshStandardMaterial({color:0x8a3b2a,roughness:.9}),
+ human:new THREE.MeshStandardMaterial({color:0x3f7fc4,roughness:.7}),
+ skin:new THREE.MeshStandardMaterial({color:0xb07850,roughness:.8}),
+ flame:new THREE.MeshBasicMaterial({color:0xffa040})
+};
+const ground=new THREE.Mesh(new THREE.CircleGeometry(2500,64),ENV.ground);ground.rotation.x=-Math.PI/2;ground.receiveShadow=true;scene.add(ground);
+
+/* =================== YAPI ARAÇLARI =================== */
+const S={root:null,groups:{},order:[],sections:[],labels:[],torches:[],focus:{},proc:null,human:null,path:null};
+function frustum(w,d,h,inset){
+ const g=new THREE.BoxGeometry(w,h,d);const p=g.attributes.position;
+ for(let i=0;i<p.count;i++)if(p.getY(i)>0){p.setX(i,p.getX(i)*(w-2*inset)/w);p.setZ(i,p.getZ(i)*(d-2*inset)/d);}
+ g.translate(0,h/2,0);g.computeVertexNormals();return g;
+}
+function grp(id){const g=new THREE.Group();g.userData.gid=id;S.root.add(g);S.groups[id]=g;S.order.push(id);return g;}
+function mesh(geo,mat,g){const m=new THREE.Mesh(geo,mat);m.castShadow=m.receiveShadow=true;m.userData.part=true;m.userData.gid=g.userData.gid;g.add(m);return m;}
+function box(g,mat,w,h,d,x,y,z){const m=mesh(new THREE.BoxGeometry(w,h,d),mat,g);m.position.set(x,y+h/2,z);return m;}
+
+// Kesik piramit kat + üst yüzey + payandalar + kesit
+function level(g,o){
+ const {w,d,h,inset,y,z=0,mat,shell=2,step=6,faces='fblr',holes=true}=o;
+ mesh(frustum(w,d,h,inset),mat,g).position.set(0,y,z);
+ box(g,MAT.top,w-2*inset,0.15,d-2*inset,0,y+h-0.05,z);
+ const ang=Math.atan(inset/h);
+ const gx=new THREE.BoxGeometry(1.8,h,1);gx.translate(0,h/2,0);
+ const gz=new THREE.BoxGeometry(1,h,1.8);gz.translate(0,h/2,0);
+ for(const s of [1,-1]){
+  if(faces.includes(s>0?'f':'b')){const n=Math.round(w/step);for(let i=1;i<n;i++){const m=mesh(gx,mat,g);m.position.set(-w/2+i*w/n,y,z+s*d/2);m.rotation.x=-s*ang;}}
+  if(faces.includes(s>0?'r':'l')){const n=Math.round(d/step);for(let i=1;i<n;i++){const m=mesh(gz,mat,g);m.position.set(s*w/2,y,z-d/2+i*d/n);m.rotation.z=s*ang;}}
+ }
+ if(holes){ // drenaj delikleri (arka cephe)
+  const hg=new THREE.BoxGeometry(.5,.5,.3);
+  for(let r=1;r<=Math.floor(h/3.2);r++){const yy=y+r*3,ins=inset*(yy-y)/h;const n=Math.round(w/step);
+   for(let i=0;i<n;i++){const m=new THREE.Mesh(hg,MAT.dark);m.userData.part=true;m.userData.gid=g.userData.gid;m.position.set(-w/2+(i+.5)*w/n,yy,z-(d/2-ins)-.05);g.add(m);}}
+ }
+ section(g,{d,h,inset,y,z,shell});
+}
+// Kesit yüzü (x=0 düzleminde, +x'e bakar)
+function trap(z,d,h,inset,y){const s=new THREE.Shape();s.moveTo(-(z-d/2),y);s.lineTo(-(z+d/2),y);s.lineTo(-(z+d/2-inset),y+h);s.lineTo(-(z-d/2+inset),y+h);s.closePath();return s;}
+function section(g,{d,h,inset,y,z,shell}){
+ const sg=new THREE.Group();sg.userData.gid=g.userData.gid;sg.visible=false;g.add(sg);S.sections.push(sg);
+ const add=(geo,mat,x)=>{const m=new THREE.Mesh(geo,mat);m.rotation.y=Math.PI/2;m.position.x=x;m.userData.part=true;m.userData.gid=g.userData.gid;sg.add(m);return m;};
+ const sh=add(new THREE.ShapeGeometry(trap(z,d,h,inset,y)),SEC.shell,.03);
+ // UV ölçeği
+ const uv=sh.geometry.attributes.uv;for(let i=0;i<uv.count;i++)uv.setXY(i,uv.getX(i)/6,uv.getY(i)/2);
+ if(!shell)return;
+ const hin=Math.max(.5,h-Math.min(shell*.5,1.2)),din=d-2*shell,iin=inset*hin/h;
+ add(new THREE.ShapeGeometry(trap(z,din,hin,iin,y)),SEC.core,.06);
+ for(let yy=y+1.4;yy<y+hin-.3;yy+=1.6){const wd=din-2*iin*(yy-y)/hin;const m=add(new THREE.PlaneGeometry(wd,.22),SEC.reed,.09);m.position.y=yy;m.position.z=z;}
+ // drenaj kanalları (çekirdekten dışa)
+ for(let yy=y+2.2;yy<y+hin-1;yy+=3.2){const len=shell+1.5;[-1,1].forEach(s=>{const wd=din-2*iin*(yy-y)/hin;const m=add(new THREE.PlaneGeometry(len,.35),SEC.drain,.1);m.position.set(.1,yy,z+s*(wd/2+len/2-1.5));});}
+}
+function stair(g,{n,len,width,h,y,dir,sx,sz,mat=MAT.stair,rails=true}){
+ const sl=len/n,sh=h/n;
+ for(let i=0;i<n;i++){
+  const hh=sh*(i+1);const cx=sx+(dir==='x+'?sl*(i+.5):dir==='x-'?-sl*(i+.5):0);const cz=sz+(dir==='z-'?-sl*(i+.5):0);
+  const along=dir[0]==='x';
+  box(g,mat,along?sl:width,hh,along?width:sl,cx,y,cz);
+  if(rails&&i%2===0)[-1,1].forEach(s=>box(g,MAT.brick1,along?sl*2:.7,hh+.8,along?.7:sl*2,cx+(along?0:s*(width/2+.35)),y,cz+(along?s*(width/2+.35):0)));
+ }
+}
+function palm(parent,x,z,s){
+ const g=new THREE.Group();g.position.set(x,0,z);g.scale.setScalar(s);g.rotation.y=Math.random()*6;
+ const t=new THREE.Mesh(new THREE.CylinderGeometry(.22,.35,8,6),ENV.trunk);t.position.y=4;t.rotation.z=.06;t.castShadow=true;g.add(t);
+ for(let i=0;i<8;i++){const l=new THREE.Mesh(new THREE.PlaneGeometry(1.1,4.2),ENV.leaf);l.geometry.translate(0,2.1,0);l.position.set(.25,8,0);l.rotation.set(0,i/8*Math.PI*2,0);l.rotateX(1.15+Math.random()*.25);l.castShadow=true;g.add(l);}
+ parent.add(g);
+}
+function person(mat){
+ const g=new THREE.Group();
+ const b=new THREE.Mesh(new THREE.CylinderGeometry(.16,.3,1.45,8),mat);b.position.y=.72;b.castShadow=true;g.add(b);
+ const h=new THREE.Mesh(new THREE.SphereGeometry(.13,10,8),ENV.skin);h.position.y=1.58;h.castShadow=true;g.add(h);
+ return g;
+}
+function torch(x,y,z,range){
+ const g=new THREE.Group();g.position.set(x,y,z);
+ const pole=new THREE.Mesh(new THREE.CylinderGeometry(.08,.1,1.6,6),ENV.trunk);pole.position.y=.8;g.add(pole);
+ const f=new THREE.Mesh(new THREE.ConeGeometry(.22,.6,8),ENV.flame);f.position.y=1.85;g.add(f);
+ const L=new THREE.PointLight(0xff8a3a,0,range,2);L.position.y=2.2;g.add(L);
+ S.root.add(g);S.torches.push({L,f});
+}
+function label(gid,text,pos,cls=''){S.labels.push({gid,text,pos,cls});}
+function proc(points){const p=new THREE.CurvePath();for(let i=0;i<points.length-1;i++)p.add(new THREE.LineCurve3(new THREE.Vector3(...points[i]),new THREE.Vector3(...points[i+1])));S.path=p;}
+
+/* =================== MODELLER =================== */
+function buildUr(){
+ const B=1.5,H1=11,W1=64,D1=46,F=D1/2;
+ // Temel + avlu
+ const g0=grp('temel');
+ mesh(frustum(124,124,B,.5),MAT.plat,g0).position.set(0,0,8);
+ section(g0,{d:124,h:B,inset:.5,y:0,z:8,shell:0});
+ const wh=4,wt=1.5;
+ box(g0,MAT.plat,124,wh,wt,0,B,-54);
+ [-1,1].forEach(s=>{box(g0,MAT.plat,wt,wh,124,s*62,B,8);box(g0,MAT.plat,55,wh,wt,s*34.5,B,70);box(g0,MAT.brick1,5,7,4,s*8,B,70);});
+ // avlu yapıları
+ [[-48,-32,18,4,26],[48,-32,18,4,26],[-50,24,14,3.5,30],[50,24,14,3.5,30],[0,-46,56,3.2,9],[-40,58,16,3,8],[40,58,16,3,8]].forEach(([x,z,w,h,d])=>{box(g0,MAT.mud,w,h,d,x,B,z);box(g0,MAT.top,w+.4,.3,d+.4,x,B+h,z);});
+ // 1. teras
+ const g1=grp('k1');
+ level(g1,{w:W1,d:D1,h:H1,inset:2.2,y:B,mat:MAT.brick1,shell:2.5,faces:'blr'});
+ // merdivenler
+ const gS=grp('merdiven');
+ stair(gS,{n:40,len:28,width:6.5,h:H1,y:B,dir:'z-',sx:0,sz:F+28});
+ stair(gS,{n:36,len:26,width:5,h:H1,y:B,dir:'x+',sx:-30,sz:F+2.6});
+ stair(gS,{n:36,len:26,width:5,h:H1,y:B,dir:'x-',sx:30,sz:F+2.6});
+ box(gS,MAT.brick2,10,4,7,0,B+H1,F-1);
+ box(gS,MAT.top,10.6,.4,7.6,0,B+H1+4,F-1);
+ const arch=new THREE.Mesh(new THREE.BoxGeometry(3,3,7.2),MAT.dark);arch.position.set(0,B+H1+1.5,F-1);arch.userData.part=true;arch.userData.gid='merdiven';gS.add(arch);
+ // 2. teras
+ const Y2=B+H1,H2=6;
+ const g2=grp('k2');
+ level(g2,{w:44,d:30,h:H2,inset:1.4,y:Y2,z:-3,mat:MAT.brick2,shell:1.5,step:5.5,faces:'fblr'});
+ stair(g2,{n:14,len:9,width:4,h:H2,y:Y2,dir:'z-',sx:0,sz:18.5,rails:false});
+ // 3. teras
+ const Y3=Y2+H2,H3=5;
+ const g3=grp('k3');
+ level(g3,{w:26,d:18,h:H3,inset:1,y:Y3,z:-5,mat:MAT.brick3,shell:1.2,step:5,faces:'fblr'});
+ stair(g3,{n:10,len:6,width:3,h:H3,y:Y3,dir:'z-',sx:0,sz:8,rails:false});
+ // tapınak
+ const Y4=Y3+H3;
+ const g4=grp('tapinak');
+ box(g4,MAT.temple,14,5,9,0,Y4,-6);
+ box(g4,MAT.blue,15,.6,10,0,Y4+5,-6);
+ for(let i=-3;i<=3;i++)if(i)box(g4,MAT.temple,.8,5,.5,i*2,Y4,-1.4);
+ const door=new THREE.Mesh(new THREE.BoxGeometry(2,3.2,.3),MAT.dark);door.position.set(0,Y4+1.6,-1.4);door.userData.part=true;door.userData.gid='tapinak';g4.add(door);
+ const cm2=cm({color:0xf4e3a1,emissive:0x6b5a20,metalness:.4,roughness:.3});
+ const cres=mesh(new THREE.TorusGeometry(1.1,.22,8,24,Math.PI*1.3),cm2,g4);cres.position.set(0,Y4+7.2,-6);cres.rotation.z=-Math.PI*.15;
+ section(g4,{d:9,h:5,inset:0,y:Y4,z:-6,shell:0});
+ // bitkiler
+ const plant=(g,x,y,z)=>{const t=mesh(new THREE.CylinderGeometry(.15,.2,1.6,6),cm({color:0x6b4a2b}),g);t.position.set(x,y+.8,z);const l=mesh(new THREE.SphereGeometry(1,8,6),cm({color:0x5f7d3a}),g);l.position.set(x,y+2,z);l.scale.y=.8;};
+ [[-27,14],[27,14],[-27,-17],[27,-17],[-25,-19.5],[25,-19.5]].forEach(([x,z])=>plant(g1,x,B+H1,z));
+ [[-17,-10],[17,-10],[-17,5],[17,5]].forEach(([x,z])=>plant(g2,x,Y2+H2,z));
+ // meşaleler
+ [-1,1].forEach(s=>{torch(s*4.2,B+H1+4.4,F+2.6,30);torch(s*1.8,Y4,-.8,25);torch(s*11,B,72.5,40);});
+ // etiketler
+ label('temel','Temel / Avlu',new THREE.Vector3(-55,7,60));
+ label('k1','1. Teras',new THREE.Vector3(-31,B+6,0));
+ label('merdiven','Merdivenler',new THREE.Vector3(17,B+7,F+9));
+ label('k2','2. Teras',new THREE.Vector3(-21.5,Y2+3,-3));
+ label('k3','3. Teras',new THREE.Vector3(-12.5,Y3+2.5,-5));
+ label('tapinak','Tapınak',new THREE.Vector3(0,Y4+9.5,-6));
+ proc([[0,B,80],[0,B,52],[0,B+H1,F+.5],[0,B+H1,F-5]]);
+ return {humanPos:[14,B,58],river:-170,palmR:[95,260]};
+}
+
+function buildBabil(){
+ const B=1.5;
+ const g0=grp('temel');
+ mesh(frustum(210,210,B,.5),MAT.plat,g0).position.set(0,0,30);
+ section(g0,{d:210,h:B,inset:.5,y:0,z:30,shell:0});
+ const wh=6,wt=2.5;
+ box(g0,MAT.plat,210,wh,wt,0,B,-75);
+ [-1,1].forEach(s=>{box(g0,MAT.plat,wt,wh,210,s*105,B,30);box(g0,MAT.plat,93,wh,wt,s*58.5,B,135);box(g0,MAT.glaze,7,10,5,s*13,B,135);});
+ [[-88,-40,28,6,60],[88,-40,28,6,60],[-88,60,28,5,60],[88,60,28,5,60],[0,-64,140,5,14],[-60,118,40,4,14],[60,118,40,4,14]].forEach(([x,z,w,h,d])=>{box(g0,MAT.mud,w,h,d,x,B,z);box(g0,MAT.top,w+.5,.4,d+.5,x,B+h,z);});
+ // 1. kat
+ const H1=33,Y1=B;
+ const g1=grp('k1');
+ level(g1,{w:91,d:91,h:H1,inset:1.5,y:Y1,mat:MAT.brick4,shell:15,step:6.5,faces:'blr'});
+ // merdiven
+ const F=45.5;
+ const gS=grp('merdiven');
+ stair(gS,{n:60,len:60,width:9,h:H1,y:B,dir:'z-',sx:0,sz:F+60});
+ stair(gS,{n:50,len:40,width:7,h:H1,y:B,dir:'x+',sx:-45,sz:F+3.6});
+ stair(gS,{n:50,len:40,width:7,h:H1,y:B,dir:'x-',sx:45,sz:F+3.6});
+ const Y2=B+H1;
+ box(gS,MAT.brick5,14,7,9,0,Y2,F-2);
+ box(gS,MAT.top,14.8,.5,9.8,0,Y2+7,F-2);
+ const arch=new THREE.Mesh(new THREE.BoxGeometry(4.5,5,9.2),MAT.dark);arch.position.set(0,Y2+2.5,F-2);arch.userData.part=true;arch.userData.gid='merdiven';gS.add(arch);
+ // 2. kat
+ const H2=18;
+ const g2=grp('k2');
+ level(g2,{w:78,d:78,h:H2,inset:1,y:Y2,z:-3,mat:MAT.brick5,shell:4,step:6.5,faces:'fblr'});
+ stair(g2,{n:30,len:18,width:6,h:H2,y:Y2,dir:'z-',sx:0,sz:F-6.5,rails:false});
+ // 3–6
+ const gU=grp('ust');
+ const specs=[[60,-6,MAT.brick6],[51,-8,MAT.brick3],[42,-10,MAT.brick2],[33,-12,MAT.brick1]];
+ let y=Y2+H2,prevFront=-3+39-1;
+ specs.forEach(([w,z,mat])=>{
+  level(gU,{w,d:w,h:6,inset:.6,y,z,mat,shell:2,step:6,faces:'fblr'});
+  const front=z+w/2;const len=Math.max(8,prevFront-front+4);
+  stair(gU,{n:12,len,width:4.5,h:6,y,dir:'z-',sx:0,sz:prevFront-.3,rails:false});
+  prevFront=front-.6;y+=6;
+ });
+ // tapınak
+ const Y7=y;
+ const g7=grp('tapinak');
+ box(g7,MAT.glaze,24,15,21,0,Y7,-14);
+ box(g7,MAT.gold,25,1,22,0,Y7+15,-14);
+ for(let i=-5;i<=5;i++)if(Math.abs(i)>1)box(g7,MAT.gold,.6,15,.4,i*2.2,Y7,-3.4);
+ const door=new THREE.Mesh(new THREE.BoxGeometry(3.5,7,.3),MAT.dark);door.position.set(0,Y7+3.5,-3.4);door.userData.part=true;door.userData.gid='tapinak';g7.add(door);
+ const fin=mesh(new THREE.ConeGeometry(1.4,4,4),MAT.gold,g7);fin.position.set(0,Y7+18,-14);
+ section(g7,{d:21,h:15,inset:0,y:Y7,z:-14,shell:0});
+ [-1,1].forEach(s=>{torch(s*6,Y2+7.5,F+2.5,60);torch(s*2.8,Y7,-2.9,40);torch(s*17,B,138,70);});
+ label('temel','Temel / Avlu',new THREE.Vector3(-95,9,112));
+ label('k1','1. Kat',new THREE.Vector3(-46,B+17,0));
+ label('merdiven','Merdivenler',new THREE.Vector3(26,B+20,72));
+ label('k2','2. Kat',new THREE.Vector3(-39.5,Y2+9,-3));
+ label('ust','3.–6. Katlar',new THREE.Vector3(-30.5,Y2+H2+12,-8));
+ label('tapinak','7. Kat · Tapınak',new THREE.Vector3(0,Y7+22,-14));
+ proc([[0,B,150],[0,B,106],[0,B+H1,F+.5],[0,B+H1,F-6]]);
+ return {humanPos:[18,B,118],river:-300,palmR:[160,420]};
+}
+
+const MODELS={
+ ur:{title:'UR ZİGURATI',sub:'Etemenniğuru · MÖ ~2100 · Ur, Irak',info:UR_INFO,build:buildUr,
+  view:{pos:[95,60,105],target:[0,12,5]},cut:{pos:[115,32,25],target:[0,10,5]},maxD:320,fog:[180,520],shadow:110,k:1,drop:45,
+  ex:{temel:0,k1:0,merdiven:5,k2:16,k3:28,tapinak:40},city:'ur'},
+ babil:{title:'BABİL ZİGURATI',sub:'Etemenanki · MÖ 7.–6. yy · Babil, Irak',info:BABIL_INFO,build:buildBabil,
+  view:{pos:[210,140,250],target:[0,38,20]},cut:{pos:[250,70,30],target:[0,40,10]},maxD:650,fog:[350,1100],shadow:190,k:1.9,drop:90,
+  ex:{temel:0,k1:0,merdiven:10,k2:32,ust:62,tapinak:95},city:'babil'}
+};
+
+/* =================== DURUM =================== */
+let M=null,curKey='ur',current='genel',tab='katlar';
+let explode=false,ex=0,cut=false,cutV=0,buildT=null,showLabels=true,procOn=false,humanOn=false,modeKey='gun';
+let envGroup=null;
+const variants=new Map();
+function variant(orig,kind){
+ if(kind==='hi'&&!orig.emissive)return orig;
+ let v=variants.get(orig);if(!v){v={};variants.set(orig,v);}
+ if(!v[kind]){const m=orig.clone();if(orig.clippingPlanes)m.clippingPlanes=[clipPlane];
+  if(kind==='hi'){m.emissive=new THREE.Color(0x5a3412);}else{m.transparent=true;m.opacity=.2;m.depthWrite=false;}
+  v[kind]=m;}
+ return v[kind];
+}
+
+function loadModel(key){
+ curKey=key;M=MODELS[key];
+ if(S.root)scene.remove(S.root);
+ if(envGroup)scene.remove(envGroup);
+ Object.assign(S,{root:new THREE.Group(),groups:{},order:[],sections:[],labels:[],torches:[],focus:{},path:null});
+ scene.add(S.root);
+ const extra=M.build();
+ // çevre: palmiyeler, nehir
+ envGroup=new THREE.Group();scene.add(envGroup);
+ let seed=7;const rnd=()=>(seed=(seed*16807)%2147483647)/2147483647;
+ for(let i=0;i<70;i++){const a=rnd()*Math.PI*2,r=extra.palmR[0]+rnd()*(extra.palmR[1]-extra.palmR[0]);const x=Math.cos(a)*r,z=Math.sin(a)*r;if(z<extra.river+40&&z>extra.river-40)continue;palm(envGroup,x,z,.9+rnd()*.5*M.k);}
+ const river=new THREE.Mesh(new THREE.PlaneGeometry(5000,55*M.k),ENV.water);river.rotation.x=-Math.PI/2;river.position.set(0,.08,extra.river);envGroup.add(river);
+ // insan ölçeği
+ const hg=new THREE.Group();const p=person(ENV.human);hg.add(p);hg.position.set(...extra.humanPos);
+ const ring=new THREE.Mesh(new THREE.RingGeometry(1.2,1.6,32),new THREE.MeshBasicMaterial({color:0x7fb3e0,side:THREE.DoubleSide}));ring.rotation.x=-Math.PI/2;ring.position.y=.05;hg.add(ring);
+ hg.visible=humanOn;S.root.add(hg);S.human=hg;
+ S.labels.push({gid:'_human',text:'🧍 İnsan · 1,7 m',pos:new THREE.Vector3(extra.humanPos[0],extra.humanPos[1]+2.6,extra.humanPos[2]),cls:'human'});
+ // rahip alayı
+ const pg=new THREE.Group();for(let i=0;i<12;i++){const pp=person(i===0?ENV.robe2:ENV.robe);pp.userData.off=i*.022;pg.add(pp);}
+ pg.visible=procOn;S.root.add(pg);S.proc=pg;
+ // odak noktaları
+ const box3=new THREE.Box3(),c=new THREE.Vector3(),sz=new THREE.Vector3(),dir=new THREE.Vector3(1,.55,1.15).normalize();
+ for(const id of S.order){box3.setFromObject(S.groups[id]);box3.getCenter(c);box3.getSize(sz);const dist=Math.max(24,sz.length()*1.3);S.focus[id]={target:c.clone(),pos:c.clone().addScaledVector(dir,dist)};}
+ // ışık/sis/kamera
+ sun.shadow.camera.left=sun.shadow.camera.bottom=-M.shadow;sun.shadow.camera.right=sun.shadow.camera.top=M.shadow;sun.shadow.camera.far=700*M.k;sun.shadow.camera.updateProjectionMatrix();
+ controls.maxDistance=M.maxD;
+ variants.clear();
+ // UI
+ $('#title').textContent=M.title;$('#sub').textContent=M.sub;document.title='3B Zigurat — '+M.title;
+ document.querySelectorAll('#models .pill').forEach(b=>b.classList.toggle('on',b.dataset.m===key));
+ const lv=$('#levels');lv.innerHTML='';
+ ['genel',...S.order].forEach(id=>{const L=M.info[id];const b=document.createElement('button');b.className='pill';b.dataset.id=id;b.innerHTML=`<span>${L.no}</span>${L.name}`;b.onclick=()=>{select(id);focusOn(id);};lv.appendChild(b);});
+ buildLabels();
+ setMode(modeKey);
+ applyCut(true);
+ select('genel');
+ flyTo(M.view.pos,M.view.target,0);
+ if(tab!=='katlar')showTab(tab);
+}
+
+/* =================== ETİKETLER =================== */
+const labelLayer=document.createElement('div');labelLayer.style.cssText='position:fixed;inset:0;pointer-events:none;z-index:2;overflow:hidden';document.body.appendChild(labelLayer);
+function buildLabels(){
+ labelLayer.innerHTML='';
+ S.labels.forEach(l=>{const d=document.createElement('div');d.className='lbl '+l.cls;d.textContent=l.text;if(S.groups[l.gid])d.onclick=()=>{select(l.gid);focusOn(l.gid);};labelLayer.appendChild(d);l.el=d;});
+}
+
+/* =================== SEÇİM =================== */
+function select(id){
+ current=id;
+ if(tab==='katlar')renderInfo();
+ document.querySelectorAll('#levels .pill').forEach(b=>b.classList.toggle('on',b.dataset.id===id));
+ S.root.traverse(o=>{if(!o.isMesh||!o.userData.part)return;const orig=o.userData.orig||(o.userData.orig=o.material);
+  o.material=id==='genel'?orig:(o.userData.gid===id?variant(orig,'hi'):variant(orig,'fade'));});
+ S.labels.forEach(l=>l.el&&l.el.classList.toggle('on',l.gid===id));
+}
+function renderInfo(){const L=M.info[current];$('#pbody').innerHTML=`<div class="tag">${L.tag}</div><h2>${L.name}</h2>${L.html}`;$('#pbody').scrollTop=0;}
+function focusOn(id){
+ if(id==='genel'){flyTo(M.view.pos,M.view.target);return;}
+ const f=S.focus[id];const dy=(M.ex[id]||0)*ex;
+ flyTo(f.pos.clone().setY(f.pos.y+dy).toArray(),f.target.clone().setY(f.target.y+dy).toArray());
+}
+
+/* =================== KAMERA =================== */
+let tw=null;
+function flyTo(pos,target,dur=1300){
+ const p=new THREE.Vector3(...pos),t=new THREE.Vector3(...target);
+ if(!dur){camera.position.copy(p);controls.target.copy(t);tw=null;return;}
+ tw={p0:camera.position.clone(),t0:controls.target.clone(),p1:p,t1:t,s:performance.now(),d:dur};
+}
+
+/* =================== SEKMELER =================== */
+function showTab(t){
+ tab=t;document.querySelectorAll('.tab[data-t]').forEach(b=>b.classList.toggle('on',b.dataset.t===t));
+ const pb=$('#pbody');
+ if(t==='katlar')renderInfo();
+ else if(t==='karsilastir')pb.innerHTML=COMPARE;
+ else if(t==='zaman')pb.innerHTML=`<div class="tag">${M.title}</div><h2>Zaman Çizelgesi</h2><div class="tl">${TIMELINE[curKey].map(([y,x])=>`<div><b>${y}</b>${x}</div>`).join('')}</div><p class="note">Diğer ziguratın zaman çizelgesi için üstten modeli değiştir.</p>`;
+ else if(t==='harita')pb.innerHTML=mapHTML();
+ else if(t==='sinav')renderQuiz();
+ else if(t==='kaynak')pb.innerHTML=SOURCES;
+ pb.scrollTop=0;
+}
+function mapHTML(){
+ const cities=[['Bağdat',150,92,'m'],['Babil',128,122,'babil'],['Nippur',160,150,''],['Uruk',186,198,''],['Ur',208,222,'ur'],['Eridu',190,242,''],['Basra',250,238,'mL']];
+ return `<div class="tag">Konum</div><h2>Mezopotamya Haritası</h2>
+ <svg viewBox="0 0 320 290" style="width:100%;border-radius:12px;background:#e3c896">
+  <path d="M195,290 L320,290 L320,210 C300,222 275,236 255,250 C232,262 212,276 195,290Z" fill="#6fa3c9"/>
+  <text x="300" y="282" font-size="10" fill="#1d3b57" font-style="italic" text-anchor="end">Basra Körfezi</text>
+  <path d="M95,0 C118,40 138,68 150,92 S174,148 196,175 S236,226 254,250" fill="none" stroke="#3f7fb0" stroke-width="3.5"/>
+  <path d="M5,48 C55,66 98,88 124,116 S150,166 172,196 S212,236 254,250" fill="none" stroke="#3f7fb0" stroke-width="3.5"/>
+  <text x="118" y="38" font-size="11" fill="#1d3b57" font-weight="600">Dicle</text>
+  <text x="30" y="72" font-size="11" fill="#1d3b57" font-weight="600">Fırat</text>
+  ${cities.map(([n,x,y,k])=>{const on=k===M.city;const mod=k[0]==='m',L=k==='mL';return `<circle cx="${x}" cy="${y}" r="${on?7:4}" fill="${on?'#c0392b':mod?'#555':'#5a3a20'}" stroke="#fff" stroke-width="${on?2:1}"/><text x="${L?x-8:x+9}" y="${y+4}" text-anchor="${L?'end':'start'}" font-size="${on?13:10.5}" font-weight="${on?700:500}" fill="${mod?'#555':'#2a1a10'}">${n}${mod?' (bugün)':''}</text>`}).join('')}
+  <g transform="translate(290,26)"><path d="M0,-14 L6,6 L0,2 L-6,6Z" fill="#2a1a10"/><text x="-4" y="20" font-size="11" font-weight="700" fill="#2a1a10">K</text></g>
+ </svg>
+ <p style="margin-top:10px">Mezopotamya, "iki nehir arasındaki ülke" demektir: <b>Dicle</b> ve <b>Fırat</b>. Ziguratlar bu verimli ovada, taşın az, kilin bol olduğu bir bölgede yapıldı.</p>
+ <p><b>Ur</b> antik çağda Fırat kıyısında ve denize yakındı. Bugün nehir yer değiştirdiği için çölün ortasında kalmıştır (Nasiriye yakını). <b>Babil</b> ise bugünkü Hille kentinin yakınındadır.</p>
+ <p class="note">Harita şematiktir, ölçekli değildir.</p>`;
+}
+function renderQuiz(){
+ const pb=$('#pbody');
+ pb.innerHTML=`<div class="tag">Kendini dene</div><h2>Mini Sınav</h2>`+QUIZ.map((q,i)=>`<div class="q"><p><b>${i+1}.</b> ${q.q}</p>${q.a.map((a,j)=>`<label><input type="radio" name="q${i}" value="${j}"> ${a}</label>`).join('')}</div>`).join('')+`<button class="btn" id="qcheck">Kontrol Et</button> <button class="btn" id="qreset" style="background:#5a4330;color:#f3e6d3">Sıfırla</button><div id="qres"></div>`;
+ $('#qcheck').onclick=()=>{let s=0;QUIZ.forEach((q,i)=>{const sel=document.querySelector(`input[name=q${i}]:checked`);document.querySelectorAll(`input[name=q${i}]`).forEach((inp,j)=>{inp.parentElement.className=j===q.c?'ok':(sel&&+sel.value===j?'bad':'');});if(sel&&+sel.value===q.c)s++;});
+  $('#qres').innerHTML=`<p class="score">${s} / ${QUIZ.length}</p><p>${s===QUIZ.length?'Mükemmel! 🎉':s>=7?'Çok iyi!':'Katlar sekmesini tekrar okuyup yeniden dene.'}</p>`;};
+ $('#qreset').onclick=renderQuiz;
+}
+
+/* =================== GÜN / GECE =================== */
+const MODES={
+ gun:{name:'☀ Gün',bg:0xe9c28a,hs:0xfff1d6,hg:0x8a6a45,hi:.75,sc:0xfff0d0,si:1,sp:[-60,90,70],torch:0,night:false},
+ batim:{name:'🌅 Gün Batımı',bg:0xe58a58,hs:0xffc89c,hg:0x6a3d2a,hi:.55,sc:0xff9550,si:1.15,sp:[-120,28,50],torch:1.2,night:false},
+ gece:{name:'🌙 Gece',bg:0x0b1224,hs:0x5468a0,hg:0x1a1410,hi:.3,sc:0xa8bcff,si:.4,sp:[90,120,-70],torch:3,night:true}
+};
+function setMode(k){
+ modeKey=k;const m=MODES[k];
+ scene.background.setHex(m.bg);scene.fog.color.setHex(m.bg);scene.fog.near=M.fog[0];scene.fog.far=M.fog[1]*(m.night?.8:1);
+ hemi.color.setHex(m.hs);hemi.groundColor.setHex(m.hg);hemi.intensity=m.hi;
+ sun.color.setHex(m.sc);sun.intensity=m.si;sun.position.set(...m.sp.map(v=>v*M.k*1.4));
+ stars.visible=moon.visible=m.night;
+ S.torches.forEach(t=>{t.L.intensity=m.torch;t.f.visible=m.torch>0;});
+ $('#bMode').textContent=m.name;
+}
+
+/* =================== KESİT =================== */
+function applyCut(instant){
+ $('#bCut').classList.toggle('on',cut);$('#legend').style.display=cut?'block':'none';
+ if(instant){cutV=cut?1:0;}
+}
+
+/* =================== SUNUM =================== */
+let pi=-1;
+function presSteps(){return['genel',...S.order];}
+function presGo(i){
+ const st=presSteps();pi=clamp(i,0,st.length-1);const id=st[pi];
+ if(tab!=='katlar')showTab('katlar');select(id);focusOn(id);
+ $('#pText').innerHTML=`<b>${M.info[id].name}</b><br><small>${pi+1} / ${st.length}</small>`;
+}
+function presStart(){controls.autoRotate=false;$('#bRotate').classList.remove('on');$('#bar').style.display='none';$('#pres').style.display='flex';$('#panel').classList.remove('hide');$('#openPanel').style.display='none';presGo(0);}
+function presEnd(){pi=-1;$('#pres').style.display='none';$('#bar').style.display='flex';select('genel');focusOn('genel');}
+
+/* =================== OLAYLAR =================== */
+document.querySelectorAll('#models .pill').forEach(b=>b.onclick=()=>{if(b.dataset.m!==curKey){loadModel(b.dataset.m);if(pi>=0)presGo(0);}});
+document.querySelectorAll('.tab[data-t]').forEach(b=>b.onclick=()=>showTab(b.dataset.t));
+$('#collapse').onclick=()=>{$('#panel').classList.add('hide');$('#openPanel').style.display='block';};
+$('#openPanel').onclick=()=>{$('#panel').classList.remove('hide');$('#openPanel').style.display='none';};
+$('#bCut').onclick=()=>{cut=!cut;applyCut();if(cut){controls.autoRotate=false;$('#bRotate').classList.remove('on');flyTo(M.cut.pos,M.cut.target);}};
+$('#bExplode').onclick=e=>{explode=!explode;e.currentTarget.classList.toggle('on',explode);};
+$('#bBuild').onclick=()=>{buildT=performance.now();explode=false;ex=0;$('#bExplode').classList.remove('on');flyTo(M.view.pos,M.view.target);};
+$('#bProc').onclick=e=>{procOn=!procOn;S.proc.visible=procOn;e.currentTarget.classList.toggle('on',procOn);};
+$('#bHuman').onclick=e=>{humanOn=!humanOn;S.human.visible=humanOn;e.currentTarget.classList.toggle('on',humanOn);
+ if(humanOn){const p=S.human.position;controls.autoRotate=false;$('#bRotate').classList.remove('on');flyTo([p.x+5,p.y+2.2,p.z+11],[p.x-2.5,p.y+3.2,p.z-10]);}};
+$('#bMode').onclick=()=>{const ks=Object.keys(MODES);setMode(ks[(ks.indexOf(modeKey)+1)%ks.length]);};
+$('#bLabels').onclick=e=>{showLabels=!showLabels;e.currentTarget.classList.toggle('on',showLabels);labelLayer.style.display=showLabels?'':'none';};
+$('#bRotate').onclick=e=>{controls.autoRotate=!controls.autoRotate;e.currentTarget.classList.toggle('on',controls.autoRotate);};
+$('#bReset').onclick=()=>{cut=false;applyCut();explode=false;$('#bExplode').classList.remove('on');select('genel');flyTo(M.view.pos,M.view.target);};
+$('#bPres').onclick=presStart;
+$('#pPrev').onclick=()=>presGo(pi-1);$('#pNext').onclick=()=>presGo(pi+1);$('#pExit').onclick=presEnd;
+$('#bShot').onclick=()=>{renderer.render(scene,camera);const url=canvas.toDataURL('image/png');
+ $('#mbody').innerHTML=`<h2 style="font-family:Cinzel,serif;color:#f6d9a4">Ekran Görüntüsü</h2><img src="${url}" alt="Zigurat görüntüsü"><p style="font-size:14px">Kaydetmek için görsele <b>sağ tıklayıp “Resmi farklı kaydet”</b>i seç (telefonda görsele basılı tut). Etiketler görüntüye dahil değildir.</p>`;
+ $('#modal').style.display='flex';};
+$('#mClose').onclick=()=>$('#modal').style.display='none';
+$('#modal').onclick=e=>{if(e.target.id==='modal')$('#modal').style.display='none';};
+addEventListener('keydown',e=>{
+ if(e.key==='Escape'){$('#modal').style.display='none';if(pi>=0)presEnd();}
+ if(pi>=0&&(e.key==='ArrowRight'||e.key===' ')){e.preventDefault();presGo(pi+1);}
+ if(pi>=0&&e.key==='ArrowLeft')presGo(pi-1);
+});
+controls.addEventListener('start',()=>{tw=null;});
+
+// tıklayarak seçim
+const ray=new THREE.Raycaster(),mouse=new THREE.Vector2();let down=null;
+function shown(o){while(o){if(!o.visible)return false;o=o.parent;}return true;}
+canvas.addEventListener('pointerdown',e=>down=[e.clientX,e.clientY]);
+canvas.addEventListener('pointerup',e=>{
+ if(!down||Math.hypot(e.clientX-down[0],e.clientY-down[1])>5)return;
+ const r=canvas.getBoundingClientRect();mouse.set((e.clientX-r.left)/r.width*2-1,-((e.clientY-r.top)/r.height)*2+1);ray.setFromCamera(mouse,camera);
+ const hits=ray.intersectObject(S.root,true).filter(h=>{const o=h.object,m=o.material;return o.userData.part&&shown(o)&&!(m.transparent&&m.opacity<.5)&&!(m.clippingPlanes&&h.point.x>clipPlane.constant+.01);});
+ if(hits.length){const id=hits[0].object.userData.gid;select(id===current?'genel':id);}else select('genel');
+});
+
+function resize(){renderer.setSize(innerWidth,innerHeight,false);camera.aspect=innerWidth/innerHeight;camera.updateProjectionMatrix();}
+addEventListener('resize',resize);resize();
+
+/* =================== DÖNGÜ =================== */
+const v=new THREE.Vector3(),tan=new THREE.Vector3();
+loadModel('ur');
+showTab('katlar');
+let last=performance.now();
+function loop(now){
+ requestAnimationFrame(loop);
+ const dt=Math.min(.1,(now-last)/1000);last=now;const lerp=r=>1-Math.pow(1-r,dt*60);
+ // kamera geçişi
+ if(tw){const k=easeIO(Math.min(1,(now-tw.s)/tw.d));camera.position.lerpVectors(tw.p0,tw.p1,k);controls.target.lerpVectors(tw.t0,tw.t1,k);if(k>=1)tw=null;}
+ // katları ayır + inşa
+ ex+=((explode?1:0)-ex)*lerp(.08);if(Math.abs((explode?1:0)-ex)<.002)ex=explode?1:0;
+ let building=false;
+ S.order.forEach((id,i)=>{const g=S.groups[id];let off=0,vis=true;
+  if(buildT!==null){const t=(now-buildT)/1000-i*.9;const k=clamp(t/.9,0,1);vis=t>0;off=(1-easeOut(k))*M.drop;if(k<1)building=true;}
+  g.visible=vis;g.position.y=off+(M.ex[id]||0)*ex;});
+ if(buildT!==null&&!building)buildT=null;
+ // kesit
+ cutV+=((cut?1:0)-cutV)*lerp(.06);if(Math.abs((cut?1:0)-cutV)<.003)cutV=cut?1:0;
+ clipPlane.constant=cutV<.002?1e4:(1-cutV)*60*M.k;
+ const secOn=cutV>.95;S.sections.forEach(s=>s.visible=secOn);
+ // alay
+ if(procOn&&S.path){const t=now/1000*.018;S.proc.children.forEach(p=>{const u=((t+p.userData.off)%1+1)%1;S.path.getPointAt(u,v);S.path.getTangentAt(u,tan);p.position.copy(v);p.position.y+=Math.sin(now/120+p.userData.off*300)*.04;p.rotation.y=Math.atan2(tan.x,tan.z);});}
+ // meşale titremesi
+ if(MODES[modeKey].torch)S.torches.forEach((t,i)=>{const f=1+Math.sin(now/90+i*1.7)*.12+Math.sin(now/37+i)*.06;t.f.scale.set(f,f*1.15,f);t.L.intensity=MODES[modeKey].torch*f;});
+ controls.update();renderer.render(scene,camera);
+ // etiketler
+ if(showLabels){const W=innerWidth,H=innerHeight;S.labels.forEach(l=>{
+  let ok=true,dy=0;
+  if(l.gid==='_human')ok=humanOn;else if(S.groups[l.gid]){ok=S.groups[l.gid].visible;dy=S.groups[l.gid].position.y;}
+  v.copy(l.pos);v.y+=dy;v.project(camera);ok=ok&&v.z<1&&Math.abs(v.x)<1.1&&Math.abs(v.y)<1.1;
+  l.el.style.display=ok?'':'none';if(ok){l.el.style.left=(v.x+1)/2*W+'px';l.el.style.top=(1-v.y)/2*H+'px';}});}
+}
+requestAnimationFrame(loop);
+</script>
+</body>
+</html>
